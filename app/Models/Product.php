@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
@@ -11,7 +12,10 @@ class Product extends Model
 
     protected $fillable = ['name'];
 
-    public function ingredients()
+    /**
+     * @return BelongsToMany
+     */
+    public function ingredients(): BelongsToMany
     {
         return $this->belongsToMany(Ingredient::class)
             ->withPivot('quantity')
