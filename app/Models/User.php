@@ -12,6 +12,10 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    const DEFAULT_CUSTOMER_EMAIL = 'customer@example.com';
+
+    const DEFAULT_CUSTOMER_NAME = 'customer';
+
     /**
      * The attributes that are mass assignable.
      *
