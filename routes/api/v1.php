@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\V1\StoreTokenController;
+use App\Http\Controllers\Api\V1\OrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,8 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::prefix('v1')
+    ->group(function () {
+        Route::post('/tokens', StoreTokenController::class);
+        Route::post('/orders', OrderController::class)
+            ->middleware('auth:sanctum')
+            ->name('api.v1.orders.store');
+    });
 
-require __DIR__ . '/api/v1.php';

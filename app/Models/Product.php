@@ -21,4 +21,12 @@ class Product extends Model
             ->withPivot('quantity')
             ->withTimestamps();
     }
+
+    // TODO add unit test for this
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class)
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }
