@@ -57,6 +57,7 @@ can use the following levels for seeding the database:
 - ```docker-compose up -d --build```
 - ```docker-compose run --rm composer install```
 - ```docker-compose run artisan key:generate```
+- ```docker-compose run artisan migrate --seed```
 - ```docker-compose run artisan queue:work``` For worker to run and execute listener
 - ```docker-compose run artisan test``` To run tests
 
@@ -65,5 +66,6 @@ can use the following levels for seeding the database:
 - ``` cp .env.example .env ```
 - ```composer install```
 - ```php artisan key:generate```
+- ```php artisan migrate --seed```
 - ```php artisan queue:work``` For worker to run and execute listener
 - ```php artisan test``` To run tests
