@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\Mail;
 class NotifyMerchant implements ShouldQueue
 {
     /**
-     * Handle the event.
-     *
-     * @param  object  $event
+     * @param  IngredientsReachBelowPercentage  $event
      * @return void
      */
     public function handle(IngredientsReachBelowPercentage $event)

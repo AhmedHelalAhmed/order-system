@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreTokenRequest;
 use App\Services\TokenService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 class StoreTokenController extends ApiController
 {
@@ -19,10 +21,10 @@ class StoreTokenController extends ApiController
     }
 
     /**
-     * Handle the incoming request.
+     * @param  StoreTokenRequest  $request
+     * @return JsonResponse
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @throws ValidationException
      */
     public function __invoke(StoreTokenRequest $request)
     {

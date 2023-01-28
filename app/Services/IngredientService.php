@@ -4,13 +4,12 @@ namespace App\Services;
 
 use App\Exceptions\IngredientOutOfStockException;
 use App\Models\IngredientOrderProduct;
-use App\Models\Order;
 use App\Models\Product;
 
 class IngredientService
 {
     /**
-     * @param  Order  $order
+     * @param  int  $orderId
      * @param  int  $productId
      * @param  int  $quantity
      * @return array

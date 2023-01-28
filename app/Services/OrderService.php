@@ -17,7 +17,7 @@ class OrderService
     private ProductService $productService;
 
     /**
-     * @param  ProductService  $productStockService
+     * @param  ProductService  $productService
      */
     public function __construct(ProductService $productService)
     {
