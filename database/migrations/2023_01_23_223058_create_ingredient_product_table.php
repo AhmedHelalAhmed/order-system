@@ -17,8 +17,8 @@ return new class extends Migration
     {
         Schema::create('ingredient_product', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Product::class);
-            $table->foreignIdFor(Ingredient::class);
+            $table->foreignIdFor(Product::class)->constrained();
+            $table->foreignIdFor(Ingredient::class)->constrained();
             $table->unsignedInteger('quantity')
                 ->comment('The stock required from ingredient to prepare the product in grams');
             $table->timestamps();

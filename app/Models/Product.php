@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -28,5 +29,14 @@ class Product extends Model
         return $this->belongsToMany(Order::class)
             ->withPivot('quantity')
             ->withTimestamps();
+    }
+
+    // TODO add unit test for this
+    /**
+     * @return HasMany
+     */
+    public function ingredientOrderProducts()
+    {
+        return $this->hasMany(IngredientOrderProduct::class);
     }
 }

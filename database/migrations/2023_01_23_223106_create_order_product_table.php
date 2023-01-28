@@ -17,8 +17,8 @@ return new class extends Migration
     {
         Schema::create('order_product', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Order::class);
-            $table->foreignIdFor(Product::class);
+            $table->foreignIdFor(Order::class)->constrained();
+            $table->foreignIdFor(Product::class)->constrained();
             $table->unsignedInteger('quantity')
                 ->comment('The quantity of the product in the order');
             $table->timestamps();

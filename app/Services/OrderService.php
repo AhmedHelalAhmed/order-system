@@ -2,32 +2,57 @@
 
 namespace App\Services;
 
+use App\Events\IngredientsReachBelowPercentage;
 use App\Models\Order;
+use Exception;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
-    private ProductStockService $productStockService;
+    /**
+     * @var ProductService
+     */
+    private ProductService $productService;
 
-    public function __construct(ProductStockService $productStockService)
+    /**
+     * @param ProductService $productStockService
+     */
+    public function __construct(ProductService $productService)
     {
-        $this->productStockService = $productStockService;
+        $this->productService = $productService;
     }
 
     /**
      * @param array $data
      * @param int $userId
-     * @return array
+     * @return bool
+     * @throws \Throwable
      */
-    public function execute(array $data, int $userId):array
+    public function execute(array $data, int $userId): bool
     {
-        $order = Order::create(['user_id' => $userId]);
-        [
-            'orderProducts' => $orderProducts,
-            'ingredientsNotificationToMerchant' => $ingredientsNotificationToMerchant
-        ] = $this->productStockService->execute($order,Arr::get($data, 'products'));
-        $order->products()->attach($orderProducts);
+        try {
+            DB::beginTransaction();
+            $ingredientsNotificationToMerchant = $this->productService->processOrderProdcuts(
+                Order::create(['user_id' => $userId]),
+                Arr::get($data, 'products')
+            );
+            DB::commit();
+            if (count($ingredientsNotificationToMerchant)) {
+                event(new IngredientsReachBelowPercentage(
+                    $ingredientsNotificationToMerchant
+                ));
+            }
+            return true;
 
-        return $ingredientsNotificationToMerchant;
+        } catch (Exception $exception) {
+            DB::rollBack();
+
+            Log::error('[order-store]: error in order: ' . $exception->getMessage(), [
+                'exception' => $exception
+            ]);
+            return false;
+        }
     }
 }

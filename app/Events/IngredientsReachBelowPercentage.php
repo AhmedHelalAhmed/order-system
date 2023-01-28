@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class IngredientsReachBelowHalfPercentage
+class IngredientsReachBelowPercentage
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,6 +19,6 @@ class IngredientsReachBelowHalfPercentage
      *
      * @return void
      */
-    public function __construct(public array $ingredientsNotificationToMerchant){}
+    public function __construct(public array $ingredientsIds){}
 
 }

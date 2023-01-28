@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Events\IngredientsReachBelowHalfPercentage;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreOrderRequest;
 use App\Services\OrderService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class OrderController extends ApiController
 {
@@ -20,26 +17,15 @@ class OrderController extends ApiController
 
     public function __invoke(StoreOrderRequest $request)
     {
-        try {
-            DB::beginTransaction();
-            $ingredientsNotificationToMerchant = $this->orderService->execute(
-                $request->validated(),
-                auth()->id()
-            );
-            dd('here we go');
-            DB::commit();
-            if (count($ingredientsNotificationToMerchant)) {
-                event(new IngredientsReachBelowHalfPercentage(
-                    $ingredientsNotificationToMerchant
-                ));
-            }
-        } catch (\Exception $exception) {
-            DB::rollBack();
+        $status = $this->orderService->execute(
+            $request->validated(),
+            auth()->id()
+        );
 
-            Log::error('[order-store]: error in order: ' . $exception->getMessage(), [
-                'exception' => $exception
-            ]);
+        if (!$status) {
+            return $this->errorResponse('something went wrong');
         }
 
+        return $this->sucessResponse(['message' => 'Successfully created']);
     }
 }

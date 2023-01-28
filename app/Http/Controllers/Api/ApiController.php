@@ -25,11 +25,11 @@ class ApiController extends Controller
 
     /**
      * @param string $message
-     * @param array $data
+     * @param array $errors
      * @param $status
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function errorResponse(string $message, array $errors = [], $status = Response::HTTP_BAD_REQUEST)
+    protected function errorResponse(string $message = '', array $errors = [], $status = Response::HTTP_BAD_REQUEST)
     {
         return response()->json([
             'status' => self::ERROR,
