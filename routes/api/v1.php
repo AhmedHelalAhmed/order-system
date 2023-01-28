@@ -16,10 +16,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')
+    ->name('api.v1.')
     ->group(function () {
         Route::post('/tokens', StoreTokenController::class);
         Route::post('/orders', OrderController::class)
             ->middleware('auth:sanctum')
-            ->name('api.v1.orders.store');
+            ->name('orders.store');
     });
 
