@@ -20,7 +20,7 @@ class IngredientService
     public function updateStock(int $orderId, int $productId, int $quantity): array
     {
         $ingredientsNotificationToMerchant = [];
-        $ingredients = Product::with('ingredients')->find($productId, ['id'])->ingredients;
+        $ingredients = Product::getIngredientsByProduct($productId);
         foreach ($ingredients as $ingredient) {
             $quantityToMakeTheProduct = $ingredient->pivot->quantity * $quantity;
             $currentStock = $ingredient->stock;
