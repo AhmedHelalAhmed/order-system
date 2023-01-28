@@ -29,4 +29,16 @@ class StoreOrderRequest extends FormRequest
             "products.*.quantity" => ["required", "integer", "min:1"]
         ];
     }
+
+    /**
+     * @return string[]
+     */
+    public function attributes(): array
+    {
+        return [
+            'products.*.product_id' => 'product',
+            'products.*.quantity' => 'quantity'
+        ];
+    }
+
 }
