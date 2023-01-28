@@ -23,10 +23,52 @@ class GenerateTokenTest extends TestCase
             'password' => 'password',
         ])->assertOk()
             ->assertJsonStructure([
-                'status',
                 'data' => [
                     'token',
                 ],
             ]);
+    }
+
+    public function test_store_tokens_validation()
+    {
+        $this->postJson(route(self::TOKENS_STORE_ROUTE_NAME))
+            ->assertUnprocessable()
+            ->assertJsonStructure([
+                'message',
+                'errors',
+            ])->assertJson(
+                [
+                    'message' => 'The email field is required. (and 2 more errors)',
+                    'errors' => [
+                        'email' => [
+                            'The email field is required.',
+                        ],
+                        'password' => [
+                            'The password field is required.',
+                        ],
+                        'device_name' => [
+                            'The device name field is required.',
+                        ],
+                    ],
+                ]
+            );
+    }
+
+    public function test_store_tokens_validation_wrong_password()
+    {
+        $user = User::factory()->create();
+        $this->postJson(route(self::TOKENS_STORE_ROUTE_NAME), [
+            'device_name' => 'test_api',
+            'email' => $user->email,
+            'password' => 'test',
+        ])->assertUnprocessable()
+            ->assertJsonStructure([
+                'message',
+                'errors',
+            ])->assertJson(
+                [
+                    'message' => 'The provided credentials are incorrect.',
+                ]
+            );
     }
 }

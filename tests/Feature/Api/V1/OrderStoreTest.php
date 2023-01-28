@@ -60,13 +60,11 @@ class OrderStoreTest extends TestCase
         $this->login();
         $this->makeOrder()
             ->assertJsonStructure([
-                'status',
                 'data' => [
                     'message',
                 ],
             ])
             ->assertJson([
-                'status' => true,
                 'data' => [
                     'message' => OrderMessageEnum::SUCCESS_MESSAGE->value,
                 ],
@@ -170,10 +168,9 @@ class OrderStoreTest extends TestCase
         $this->makeOrder()
             ->assertStatus(Response::HTTP_BAD_REQUEST)
             ->assertJsonStructure(
-                ['status', 'errors', 'message']
+                ['errors', 'message']
             )->assertJson(
                 [
-                    'status' => false,
                     'errors' => [],
                     'message' => OrderMessageEnum::FAILED_MESSAGE->value,
                 ]
@@ -183,6 +180,73 @@ class OrderStoreTest extends TestCase
             'is_merchant_notified' => true,
         ]);
         Mail::assertSent(IngredientReachPercentageLimit::class, 1);
+    }
+
+    public function test_store_order_validation_for_products()
+    {
+        $this->login();
+        $this->postJson(route(self::ORDER_STORE_ROUTE_NAME))
+            ->assertUnprocessable()
+            ->assertJsonStructure(['errors', 'message'])
+            ->assertJson(
+                [
+                    'errors' => [
+                        'products' => [
+                            'The products field is required.',
+                        ],
+                    ],
+                    'message' => 'The products field is required.',
+                ]
+            );
+    }
+
+    public function test_store_order_validation_for_quantity()
+    {
+        $this->login();
+        $this->postJson(route(self::ORDER_STORE_ROUTE_NAME, [
+            'products' => [
+                [
+                    'product_id' => self::DEFAULT_PRODUCT_ID,
+                ],
+            ],
+        ]))
+            ->assertUnprocessable()
+            ->assertJsonStructure(['errors', 'message'])
+            ->assertJson(
+                [
+                    'errors' => [
+                        'products.0.quantity' => [
+                            'The quantity field is required.',
+                        ],
+                    ],
+                    'message' => 'The quantity field is required.',
+                ]
+            );
+    }
+
+    public function test_store_order_validation_for_product_id()
+    {
+        $this->login();
+        $this->postJson(route(self::ORDER_STORE_ROUTE_NAME, [
+            'products' => [
+                [
+                    'product_id' => self::DEFAULT_PRODUCT_ID + 99999,
+                    'quantity' => 1,
+                ],
+            ],
+        ]))
+            ->assertUnprocessable()
+            ->assertJsonStructure(['errors', 'message'])
+            ->assertJson(
+                [
+                    'errors' => [
+                        'products.0.product_id' => [
+                            'The selected product is invalid.',
+                        ],
+                    ],
+                    'message' => 'The selected product is invalid.',
+                ]
+            );
     }
 
     /**

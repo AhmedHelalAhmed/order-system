@@ -4,12 +4,20 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreTokenRequest;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use App\Services\TokenService;
 
 class StoreTokenController extends ApiController
 {
+    private TokenService $service;
+
+    /**
+     * @param  TokenService  $service
+     */
+    public function __construct(TokenService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Handle the incoming request.
      *
@@ -18,16 +26,12 @@ class StoreTokenController extends ApiController
      */
     public function __invoke(StoreTokenRequest $request)
     {
-        $user = User::where('email', $request->email)->first();
-
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
-        }
-
         return $this->sucessResponse([
-            'token' => $user->createToken($request->device_name)->plainTextToken,
+            'token' => $this->service->getToken(
+                $request->get('email'),
+                $request->get('password'),
+                $request->get('device_name')
+            ),
         ]);
     }
 }
