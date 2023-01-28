@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\IngredientOutOfStockException;
 use App\Models\IngredientOrderProduct;
 use App\Models\Order;
 use App\Models\Product;
-use Exception;
 
 class IngredientService
 {
@@ -24,7 +24,9 @@ class IngredientService
         foreach ($ingredients as $ingredient) {
             $quantityToMakeTheProduct = $ingredient->pivot->quantity * $quantity;
             $currentStock = $ingredient->stock;
-            throw_if($currentStock < $quantityToMakeTheProduct, new Exception('ingredient out of stock'));
+            throw_if($currentStock < $quantityToMakeTheProduct, new IngredientOutOfStockException(
+                "ingredient {$ingredient->name} with id {$ingredient->id} out of stock")
+            );
             $ingredient->decrement('stock', $quantityToMakeTheProduct);
             if ($ingredient->isMerchantStockNotificationReady($quantityToMakeTheProduct)) {
                 $ingredientsNotificationToMerchant[] = $ingredient->id;

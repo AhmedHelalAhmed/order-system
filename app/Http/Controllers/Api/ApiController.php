@@ -7,10 +7,6 @@ use Illuminate\Http\Response;
 
 class ApiController extends Controller
 {
-    const SUCCESS = true;
-
-    const ERROR = false;
-
     /**
      * @param  array  $data
      * @param $status
@@ -19,7 +15,7 @@ class ApiController extends Controller
     protected function sucessResponse(array $data = [], $status = Response::HTTP_OK)
     {
         return response()->json([
-            'status' => self::SUCCESS,
+            'status' => true,
             'data' => $data,
         ], $status);
     }
@@ -33,7 +29,7 @@ class ApiController extends Controller
     protected function errorResponse(string $message = '', array $errors = [], $status = Response::HTTP_BAD_REQUEST)
     {
         return response()->json([
-            'status' => self::ERROR,
+            'status' => false,
             'errors' => $errors,
             'message' => $message,
         ], $status);

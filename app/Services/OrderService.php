@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Events\IngredientsReachBelowPercentage;
+use App\Exceptions\IngredientOutOfStockException;
 use App\Models\Order;
-use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -47,7 +47,7 @@ class OrderService
             }
 
             return true;
-        } catch (Exception $exception) {
+        } catch (IngredientOutOfStockException $exception) {
             DB::rollBack();
 
             Log::error('[order-store]: error in order: '.$exception->getMessage(), [
