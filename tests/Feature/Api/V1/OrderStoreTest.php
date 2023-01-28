@@ -110,7 +110,13 @@ class OrderStoreTest extends TestCase
         ]);
 
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
-        $ingredients->each(fn ($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
+        $ingredients->each(fn($ingredient) => $this->assertDatabaseHas('ingredients', [
+            'name' => $ingredient->name,
+            'id' => $ingredient->id,
+            'start_stock' => $ingredient->start_stock,
+            'stock' => $ingredient->start_stock - $ingredient->pivot->quantity * $quantity,
+            'is_merchant_notified' => false,
+        ]))->each(fn($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
             'order_id' => $order->id,
             'product_id' => $ingredient->pivot->product_id,
             'ingredient_id' => $ingredient->id,
@@ -125,10 +131,10 @@ class OrderStoreTest extends TestCase
         $this->login();
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
         while (
-            ! $ingredients
-                ->fresh()
-                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
+        !$ingredients
+            ->fresh()
+            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
+            ->first(fn($isBelowPercentage) => $isBelowPercentage)
         ) {
             $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
                 'products' => [
@@ -150,10 +156,10 @@ class OrderStoreTest extends TestCase
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
         // Here the ingredient will reach the limit of level to notify the merchant
         while (
-            ! $ingredients
-                ->fresh()
-                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
+        !$ingredients
+            ->fresh()
+            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
+            ->first(fn($isBelowPercentage) => $isBelowPercentage)
         ) {
             $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
                 'products' => [
@@ -174,6 +180,9 @@ class OrderStoreTest extends TestCase
                 ],
             ],
         ])->assertOk();
+        $this->assertDatabaseHas('ingredients', [
+            'is_merchant_notified' => true,
+        ]);
         Mail::assertSent(IngredientReachPercentageLimit::class, 1);
     }
 }
