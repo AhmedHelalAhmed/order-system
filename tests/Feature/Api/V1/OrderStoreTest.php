@@ -46,15 +46,7 @@ class OrderStoreTest extends TestCase
 
     public function test_unauthenticated_user_can_not_make_order()
     {
-        $response = $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            'products' => [
-                [
-                    'product_id' => self::DEFAULT_PRODUCT_ID,
-                    'quantity' => 2,
-                ],
-            ],
-        ]);
-        $response->assertUnauthorized();
+        $this->makeOrder()->assertUnauthorized();
     }
 
     /**
@@ -65,14 +57,7 @@ class OrderStoreTest extends TestCase
     public function test_order_store_success_response()
     {
         $this->login();
-        $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            'products' => [
-                [
-                    'product_id' => self::DEFAULT_PRODUCT_ID,
-                    'quantity' => 2,
-                ],
-            ],
-        ])
+        $this->makeOrder()
             ->assertJsonStructure([
                 'status',
                 'data' => [
@@ -93,14 +78,7 @@ class OrderStoreTest extends TestCase
         $user = $this->login();
         $this->assertEquals(0, Order::count());
         $quantity = 2;
-        $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            'products' => [
-                [
-                    'product_id' => self::DEFAULT_PRODUCT_ID,
-                    'quantity' => $quantity,
-                ],
-            ],
-        ])->assertOk();
+        $this->makeOrder()->assertOk();
         $this->assertEquals(1, Order::count());
         $order = Order::first();
         $this->assertEquals($user->id, $order->user_id);
@@ -112,13 +90,13 @@ class OrderStoreTest extends TestCase
         ]);
 
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
-        $ingredients->each(fn ($ingredient) => $this->assertDatabaseHas('ingredients', [
+        $ingredients->each(fn($ingredient) => $this->assertDatabaseHas('ingredients', [
             'name' => $ingredient->name,
             'id' => $ingredient->id,
             'start_stock' => $ingredient->start_stock,
             'stock' => $ingredient->start_stock - $ingredient->pivot->quantity * $quantity,
             'is_merchant_notified' => false,
-        ]))->each(fn ($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
+        ]))->each(fn($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
             'order_id' => $order->id,
             'product_id' => $ingredient->pivot->product_id,
             'ingredient_id' => $ingredient->id,
@@ -133,19 +111,12 @@ class OrderStoreTest extends TestCase
         $this->login();
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
         while (
-            ! $ingredients
-                ->fresh()
-                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
+        !$ingredients
+            ->fresh()
+            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
+            ->first(fn($isBelowPercentage) => $isBelowPercentage)
         ) {
-            $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-                'products' => [
-                    [
-                        'product_id' => self::DEFAULT_PRODUCT_ID,
-                        'quantity' => 2,
-                    ],
-                ],
-            ])->assertOk();
+            $this->makeOrder()->assertOk();
         }
 
         Event::assertDispatched(IngredientsReachBelowPercentage::class);
@@ -161,30 +132,16 @@ class OrderStoreTest extends TestCase
             'is_merchant_notified' => true,
         ]);
         while (
-            ! $ingredients
-                ->fresh()
-                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
+        !$ingredients
+            ->fresh()
+            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
+            ->first(fn($isBelowPercentage) => $isBelowPercentage)
         ) {
-            $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-                'products' => [
-                    [
-                        'product_id' => self::DEFAULT_PRODUCT_ID,
-                        'quantity' => 2,
-                    ],
-                ],
-            ])->assertOk();
+            $this->makeOrder()->assertOk();
         }
 
         // Try to another request to notify the merchant to confirm it will send only one time
-        $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            'products' => [
-                [
-                    'product_id' => self::DEFAULT_PRODUCT_ID,
-                    'quantity' => 2,
-                ],
-            ],
-        ])->assertOk();
+        $this->makeOrder()->assertOk();
         $this->assertDatabaseHas('ingredients', [
             'is_merchant_notified' => true,
         ]);
@@ -201,29 +158,15 @@ class OrderStoreTest extends TestCase
             'is_merchant_notified' => true,
         ]);
         while (
-            ! $ingredients
-                ->fresh()
-                ->map(fn ($ingredient) => $ingredient->stock == 0)
-                ->first(fn ($currenStockCanNotMakeProduct) => $currenStockCanNotMakeProduct)
+        !$ingredients
+            ->fresh()
+            ->map(fn($ingredient) => $ingredient->stock == 0)
+            ->first(fn($currenStockCanNotMakeProduct) => $currenStockCanNotMakeProduct)
         ) {
-            $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-                'products' => [
-                    [
-                        'product_id' => self::DEFAULT_PRODUCT_ID,
-                        'quantity' => 2,
-                    ],
-                ],
-            ]);
+            $this->makeOrder();
         }
 
-        $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            'products' => [
-                [
-                    'product_id' => self::DEFAULT_PRODUCT_ID,
-                    'quantity' => 2,
-                ],
-            ],
-        ])
+        $this->makeOrder()
             ->assertStatus(Response::HTTP_BAD_REQUEST)
             ->assertJsonStructure(
                 ['status', 'errors', 'message']
@@ -239,5 +182,17 @@ class OrderStoreTest extends TestCase
             'is_merchant_notified' => true,
         ]);
         Mail::assertSent(IngredientReachPercentageLimit::class, 1);
+    }
+
+    private function makeOrder(int $quantity = 2)
+    {
+        return $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
+            'products' => [
+                [
+                    'product_id' => self::DEFAULT_PRODUCT_ID,
+                    'quantity' => $quantity,
+                ],
+            ],
+        ]);
     }
 }
