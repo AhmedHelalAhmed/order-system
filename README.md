@@ -61,6 +61,16 @@ can use the following levels for seeding the database:
 - ```docker-compose run artisan queue:work``` For worker to run and execute listener
 - ```docker-compose run artisan test``` To run tests
 
+## Docker containers
+- artisan: to run artisan commands
+- composer: to run composer commands
+- database server: mariadb database server
+- mailhog: for testing and reviewing emails
+- php: required for webserver to work with php
+- phpmyadmin: ui for database
+- redis: in-memory database use here as queue driver
+- webserver: nginx
+
 ## Commands without docker
 - Clone the project
 - ``` cp .env.example .env ```
@@ -69,3 +79,5 @@ can use the following levels for seeding the database:
 - ```php artisan migrate --seed```
 - ```php artisan queue:work``` For worker to run and execute listener
 - ```php artisan test``` To run tests
+- ```php artisan serve``` To the built-in web server
+- Finally Change database and redis configuration iin .env file with yours
