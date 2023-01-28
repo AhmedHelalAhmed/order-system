@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -24,21 +23,14 @@ class Product extends Model
             ->withTimestamps();
     }
 
-    // TODO add unit test for this
-    public function orders()
+    /**
+     * @return BelongsToMany
+     */
+    public function orders(): BelongsToMany
     {
         return $this->belongsToMany(Order::class)
             ->withPivot('quantity')
             ->withTimestamps();
-    }
-
-    // TODO add unit test for this
-    /**
-     * @return HasMany
-     */
-    public function ingredientOrderProducts()
-    {
-        return $this->hasMany(IngredientOrderProduct::class);
     }
 
     /**

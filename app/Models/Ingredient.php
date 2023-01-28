@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ingredient extends Model
 {
@@ -27,16 +27,6 @@ class Ingredient extends Model
         return $this->belongsToMany(Product::class)
             ->withPivot('quantity')
             ->withTimestamps();
-    }
-
-    // TODO add unit test for this
-
-    /**
-     * @return HasMany
-     */
-    public function ingredientOrderProducts()
-    {
-        return $this->hasMany(IngredientOrderProduct::class);
     }
 
     /**
@@ -69,7 +59,7 @@ class Ingredient extends Model
      * @param  int  $quantityToDecrease
      * @return float|int
      */
-    public function getCurrentStockPercentage(int $quantityToDecrease = 0)
+    public function getCurrentStockPercentage(int $quantityToDecrease = 0): float|int
     {
         return (($this->stock - $quantityToDecrease) / $this->start_stock) * 100;
     }
@@ -78,16 +68,16 @@ class Ingredient extends Model
      * @param  Builder  $query
      * @return Builder
      */
-    public function scopeMerchantNotNotified(Builder $query)
+    public function scopeMerchantNotNotified(Builder $query): Builder
     {
         return $query->where('is_merchant_notified', false);
     }
 
     /**
      * @param  array  $ingredientsIds
-     * @return mixed
+     * @return Collection
      */
-    public static function getWithMerchantNotNotified(array $ingredientsIds)
+    public static function getWithMerchantNotNotified(array $ingredientsIds): Collection
     {
         return self::select('name', 'id')
             ->whereIn('id', $ingredientsIds)
@@ -99,7 +89,7 @@ class Ingredient extends Model
      * @param  array  $ingredientsIds
      * @return void
      */
-    public static function updateMerchantToNotified(array $ingredientsIds)
+    public static function updateMerchantToNotified(array $ingredientsIds): void
     {
         self::whereIn('id', $ingredientsIds)->update(['is_merchant_notified' => true]);
     }

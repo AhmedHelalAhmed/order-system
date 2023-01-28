@@ -18,29 +18,26 @@ class IngredientOrderProduct extends Pivot
         'total_quantity',
     ];
 
-    // TODO add unit test for this
     /**
      * @return BelongsTo
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    // TODO add unit test for this
     /**+
      * @return BelongsTo
      */
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    // TODO add unit test for this
     /**
      * @return BelongsTo
      */
-    public function ingredient()
+    public function ingredient(): BelongsTo
     {
         return $this->belongsTo(Ingredient::class);
     }
