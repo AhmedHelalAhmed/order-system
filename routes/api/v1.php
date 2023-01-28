@@ -18,7 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')
     ->name('api.v1.')
     ->group(function () {
-        Route::post('/tokens', StoreTokenController::class);
+        Route::post('/tokens', StoreTokenController::class)
+            ->name('tokens.store');
         Route::post('/orders', OrderController::class)
             ->middleware('auth:sanctum')
             ->name('orders.store');

@@ -13,6 +13,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -90,13 +91,13 @@ class OrderStoreTest extends TestCase
         ]);
 
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
-        $ingredients->each(fn($ingredient) => $this->assertDatabaseHas('ingredients', [
+        $ingredients->each(fn ($ingredient) => $this->assertDatabaseHas('ingredients', [
             'name' => $ingredient->name,
             'id' => $ingredient->id,
             'start_stock' => $ingredient->start_stock,
             'stock' => $ingredient->start_stock - $ingredient->pivot->quantity * $quantity,
             'is_merchant_notified' => false,
-        ]))->each(fn($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
+        ]))->each(fn ($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
             'order_id' => $order->id,
             'product_id' => $ingredient->pivot->product_id,
             'ingredient_id' => $ingredient->id,
@@ -111,10 +112,10 @@ class OrderStoreTest extends TestCase
         $this->login();
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
         while (
-        !$ingredients
-            ->fresh()
-            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-            ->first(fn($isBelowPercentage) => $isBelowPercentage)
+            ! $ingredients
+                ->fresh()
+                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < intval(config('main.limit_percentage_notification')))
+                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
         ) {
             $this->makeOrder()->assertOk();
         }
@@ -132,10 +133,10 @@ class OrderStoreTest extends TestCase
             'is_merchant_notified' => true,
         ]);
         while (
-        !$ingredients
-            ->fresh()
-            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-            ->first(fn($isBelowPercentage) => $isBelowPercentage)
+            ! $ingredients
+                ->fresh()
+                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < intval(config('main.limit_percentage_notification')))
+                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
         ) {
             $this->makeOrder()->assertOk();
         }
@@ -158,14 +159,14 @@ class OrderStoreTest extends TestCase
             'is_merchant_notified' => true,
         ]);
         while (
-        !$ingredients
-            ->fresh()
-            ->map(fn($ingredient) => $ingredient->stock == 0)
-            ->first(fn($currenStockCanNotMakeProduct) => $currenStockCanNotMakeProduct)
+            ! $ingredients
+                ->fresh()
+                ->map(fn ($ingredient) => $ingredient->stock == 0)
+                ->first(fn ($currenStockCanNotMakeProduct) => $currenStockCanNotMakeProduct)
         ) {
             $this->makeOrder();
         }
-
+        // now the stock of one of ingredient is one so the order must fail
         $this->makeOrder()
             ->assertStatus(Response::HTTP_BAD_REQUEST)
             ->assertJsonStructure(
@@ -184,6 +185,10 @@ class OrderStoreTest extends TestCase
         Mail::assertSent(IngredientReachPercentageLimit::class, 1);
     }
 
+    /**
+     * @param  int  $quantity
+     * @return TestResponse
+     */
     private function makeOrder(int $quantity = 2)
     {
         return $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
