@@ -51,16 +51,16 @@ can use the following levels for seeding the database:
 - Event fired (IngredientsReachBelowPercentage) to notify the merchant when the stock reach below 50% of the level for ingredient with queue listener (NotifyMerchant) using redis
 - Integration and unit tests
 - You should first generate token from (Generate bearer tokens API) and send it in order API check postman collection
-
-## Docker environment steps to setup the projects
+- Note: in postman once you hit Generate bearer tokens API it should bearer token automatically if not please add in in authentication bearer method for Store order API
+## Docker environment steps to set up the projects
 - Clone the project then open terminal inside the project directory and run
 - ``` cp .env.example .env ```
 - ```docker-compose up -d --build```
 - ```docker-compose run --rm composer install```
 - ```docker-compose run artisan key:generate```
 - ```docker-compose run artisan migrate --seed```
-- ```docker-compose run artisan queue:work``` For worker to run and execute listener
 - ```docker-compose run artisan test``` To run tests
+- ```docker-compose run artisan queue:work``` For worker to run and execute listener
 
 ## Docker containers
 - artisan: to run artisan commands
@@ -73,18 +73,15 @@ can use the following levels for seeding the database:
 - webserver: nginx
 
 ## links for docker in local [Postman collection](https://www.postman.com/ahmedhelalahmed/workspace/ahmed-helal/collection/3913416-5b97c36f-5975-47f6-b42e-6bbe61533694?action=share&creator=3913416)
-- [Generate bearer tokens API](http://localhost/api/v1/tokens)
-- [Store order API](http://localhost/api/v1/orders)
 - [phpmyadmin](http://localhost:8080)
 - [mailhog](http://localhost:8025)
 
 ## Commands without docker
-- Clone the project
-- ``` cp .env.example .env ```
+- Clone the project 
+- ``` cp .env.example .env ``` Change database and redis configuration iin .env file with yours
 - ```composer install```
 - ```php artisan key:generate```
 - ```php artisan migrate --seed```
-- ```php artisan queue:work``` For worker to run and execute listener
 - ```php artisan test``` To run tests
-- ```php artisan serve``` To the built-in web server
-- Finally Change database and redis configuration iin .env file with yours
+- ```php artisan queue:work``` For worker to run and execute listener and keep it running
+- ```php artisan serve``` Open new terminal inside the project directory to execute the built-in web server
