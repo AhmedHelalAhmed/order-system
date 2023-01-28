@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\OrderMessageEnum;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Requests\Api\V1\StoreOrderRequest;
 use App\Services\OrderService;
@@ -23,9 +24,9 @@ class OrderController extends ApiController
         );
 
         if (!$status) {
-            return $this->errorResponse('something went wrong');
+            return $this->errorResponse(OrderMessageEnum::FAILED_MESSAGE->value);
         }
 
-        return $this->sucessResponse(['message' => 'Successfully created']);
+        return $this->sucessResponse(['message' => OrderMessageEnum::SUCCESS_MESSAGE->value]);
     }
 }
