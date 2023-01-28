@@ -27,7 +27,7 @@ class StoreTokenController extends ApiController
         }
 
         return $this->sucessResponse([
-            'token' => $user->createToken($request->device_name)->plainTextToken
+            'token' => $user->createToken($request->device_name)->plainTextToken,
         ]);
     }
 }

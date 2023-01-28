@@ -8,10 +8,11 @@ use Illuminate\Http\Response;
 class ApiController extends Controller
 {
     const SUCCESS = true;
+
     const ERROR = false;
 
     /**
-     * @param array $data
+     * @param  array  $data
      * @param $status
      * @return \Illuminate\Http\JsonResponse
      */
@@ -19,13 +20,13 @@ class ApiController extends Controller
     {
         return response()->json([
             'status' => self::SUCCESS,
-            'data' => $data
+            'data' => $data,
         ], $status);
     }
 
     /**
-     * @param string $message
-     * @param array $errors
+     * @param  string  $message
+     * @param  array  $errors
      * @param $status
      * @return \Illuminate\Http\JsonResponse
      */

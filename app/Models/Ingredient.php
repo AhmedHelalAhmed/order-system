@@ -39,7 +39,7 @@ class Ingredient extends Model
     }
 
     /**
-     * @param int $quantityToDecrease
+     * @param  int  $quantityToDecrease
      * @return bool
      */
     public function isCurrentStockReadyForMerchantNotification(int $quantityToDecrease): bool
@@ -52,12 +52,11 @@ class Ingredient extends Model
      */
     public function isMerchantNotNotified(): bool
     {
-
-        return !$this->is_merchant_notified;
+        return ! $this->is_merchant_notified;
     }
 
     /**
-     * @param int $quantityToDecrease
+     * @param  int  $quantityToDecrease
      * @return bool
      */
     public function isMerchantStockNotificationReady(int $quantityToDecrease): bool
@@ -66,7 +65,7 @@ class Ingredient extends Model
     }
 
     /**
-     * @param int $quantityToDecrease
+     * @param  int  $quantityToDecrease
      * @return float|int
      */
     public function getCurrentStockPercentage(int $quantityToDecrease = 0)

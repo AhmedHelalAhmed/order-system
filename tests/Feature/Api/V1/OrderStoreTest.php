@@ -9,16 +9,17 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Laravel\Sanctum\Sanctum;
-use Tests\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
+use Laravel\Sanctum\Sanctum;
+use Tests\TestCase;
 
 class OrderStoreTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
     const ORDER_STORE_ROUTE_NAME = 'api.v1.orders.store';
+
     const DEFAULT_PRODUCT_ID = 1;
 
     protected function setUp(): void
@@ -37,18 +38,19 @@ class OrderStoreTest extends TestCase
         Sanctum::actingAs(
             $user
         );
+
         return $user;
     }
 
     public function test_unauthenticated_user_can_not_make_order()
     {
         $response = $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            "products" => [
+            'products' => [
                 [
-                    "product_id" => self::DEFAULT_PRODUCT_ID,
-                    "quantity" => 2
-                ]
-            ]
+                    'product_id' => self::DEFAULT_PRODUCT_ID,
+                    'quantity' => 2,
+                ],
+            ],
         ]);
         $response->assertUnauthorized();
     }
@@ -60,27 +62,26 @@ class OrderStoreTest extends TestCase
      */
     public function test_order_store_success_response()
     {
-
         $this->login();
         $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            "products" => [
+            'products' => [
                 [
-                    "product_id" => self::DEFAULT_PRODUCT_ID,
-                    "quantity" => 2
-                ]
-            ]
+                    'product_id' => self::DEFAULT_PRODUCT_ID,
+                    'quantity' => 2,
+                ],
+            ],
         ])
             ->assertJsonStructure([
-                "status",
-                "data" => [
-                    "message"
-                ]
+                'status',
+                'data' => [
+                    'message',
+                ],
             ])
             ->assertJson([
-                "status" => true,
-                "data" => [
-                    "message" => OrderMessageEnum::SUCCESS_MESSAGE->value
-                ]
+                'status' => true,
+                'data' => [
+                    'message' => OrderMessageEnum::SUCCESS_MESSAGE->value,
+                ],
             ])
             ->assertOk();
     }
@@ -91,12 +92,12 @@ class OrderStoreTest extends TestCase
         $this->assertEquals(0, Order::count());
         $quantity = 2;
         $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            "products" => [
+            'products' => [
                 [
-                    "product_id" => self::DEFAULT_PRODUCT_ID,
-                    "quantity" => $quantity
-                ]
-            ]
+                    'product_id' => self::DEFAULT_PRODUCT_ID,
+                    'quantity' => $quantity,
+                ],
+            ],
         ])->assertOk();
         $this->assertEquals(1, Order::count());
         $order = Order::first();
@@ -109,15 +110,14 @@ class OrderStoreTest extends TestCase
         ]);
 
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
-        $ingredients->each(fn($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
+        $ingredients->each(fn ($ingredient) => $this->assertDatabaseHas('ingredient_order_product', [
             'order_id' => $order->id,
             'product_id' => $ingredient->pivot->product_id,
             'ingredient_id' => $ingredient->id,
             'quantity' => $ingredient->pivot->quantity,
-            'total_quantity' => $ingredient->pivot->quantity * $quantity
+            'total_quantity' => $ingredient->pivot->quantity * $quantity,
         ]));
     }
-
 
     public function test_when_ingredient_reach_below_limit_percentage_event_of_ingredients_reach_below_percentage_fired()
     {
@@ -125,24 +125,23 @@ class OrderStoreTest extends TestCase
         $this->login();
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
         while (
-        !$ingredients
-            ->fresh()
-            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-            ->first(fn($isBelowPercentage) => $isBelowPercentage)
+            ! $ingredients
+                ->fresh()
+                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
+                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
         ) {
             $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-                "products" => [
+                'products' => [
                     [
-                        "product_id" => self::DEFAULT_PRODUCT_ID,
-                        "quantity" => 2
-                    ]
-                ]
+                        'product_id' => self::DEFAULT_PRODUCT_ID,
+                        'quantity' => 2,
+                    ],
+                ],
             ])->assertOk();
         }
 
         Event::assertDispatched(IngredientsReachBelowPercentage::class);
     }
-
 
     public function test_when_ingredient_reach_below_limit_percentage_email_will_send_one_time()
     {
@@ -151,31 +150,30 @@ class OrderStoreTest extends TestCase
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
         // Here the ingredient will reach the limit of level to notify the merchant
         while (
-        !$ingredients
-            ->fresh()
-            ->map(fn($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
-            ->first(fn($isBelowPercentage) => $isBelowPercentage)
+            ! $ingredients
+                ->fresh()
+                ->map(fn ($ingredient) => $ingredient->getCurrentStockPercentage() < 50)
+                ->first(fn ($isBelowPercentage) => $isBelowPercentage)
         ) {
             $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-                "products" => [
+                'products' => [
                     [
-                        "product_id" => self::DEFAULT_PRODUCT_ID,
-                        "quantity" => 2
-                    ]
-                ]
+                        'product_id' => self::DEFAULT_PRODUCT_ID,
+                        'quantity' => 2,
+                    ],
+                ],
             ])->assertOk();
         }
 
         // Try to another request to notify the merchant to confirm it will send only one time
         $this->postJson(route(self::ORDER_STORE_ROUTE_NAME), [
-            "products" => [
+            'products' => [
                 [
-                    "product_id" => self::DEFAULT_PRODUCT_ID,
-                    "quantity" => 2
-                ]
-            ]
+                    'product_id' => self::DEFAULT_PRODUCT_ID,
+                    'quantity' => 2,
+                ],
+            ],
         ])->assertOk();
         Mail::assertSent(IngredientReachPercentageLimit::class, 1);
     }
-
 }

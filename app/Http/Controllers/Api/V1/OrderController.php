@@ -23,7 +23,7 @@ class OrderController extends ApiController
             auth()->id()
         );
 
-        if (!$status) {
+        if (! $status) {
             return $this->errorResponse(OrderMessageEnum::FAILED_MESSAGE->value);
         }
 

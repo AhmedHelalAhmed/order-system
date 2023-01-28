@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -18,7 +17,9 @@ class IngredientReachPercentageLimit extends Mailable
      *
      * @return void
      */
-    public function __construct(public array $ingredients){}
+    public function __construct(public array $ingredients)
+    {
+    }
 
     /**
      * Get the message envelope.
@@ -39,13 +40,12 @@ class IngredientReachPercentageLimit extends Mailable
      */
     public function content()
     {
-        return (new Content(
+        return new Content(
             markdown: 'emails.stock-limit',
             with: [
-                "ingredients" => $this->ingredients,
-                "percentage" => config('main.limit_percentage_notification')
+                'ingredients' => $this->ingredients,
+                'percentage' => config('main.limit_percentage_notification'),
             ]
-        ));
+        );
     }
-
 }

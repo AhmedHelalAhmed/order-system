@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\V1\StoreTokenController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\StoreTokenController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,4 +23,3 @@ Route::prefix('v1')
             ->middleware('auth:sanctum')
             ->name('orders.store');
     });
-

@@ -10,10 +10,11 @@ use Exception;
 class IngredientService
 {
     /**
-     * @param Order $order
-     * @param int $productId
-     * @param int $quantity
+     * @param  Order  $order
+     * @param  int  $productId
+     * @param  int  $quantity
      * @return array
+     *
      * @throws \Throwable
      */
     public function updateStock(int $orderId, int $productId, int $quantity): array
@@ -36,6 +37,7 @@ class IngredientService
                 'total_quantity' => $quantityToMakeTheProduct,
             ]);
         }
+
         return $ingredientsNotificationToMerchant;
     }
 }

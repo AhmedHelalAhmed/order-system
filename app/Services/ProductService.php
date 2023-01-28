@@ -13,7 +13,7 @@ class ProductService
     private IngredientService $ingredientService;
 
     /**
-     * @param IngredientService $ingredientService
+     * @param  IngredientService  $ingredientService
      */
     public function __construct(IngredientService $ingredientService)
     {
@@ -21,9 +21,10 @@ class ProductService
     }
 
     /**
-     * @param Order $order
-     * @param array $products
+     * @param  Order  $order
+     * @param  array  $products
      * @return array
+     *
      * @throws \Throwable
      */
     public function processOrderProdcuts(Order $order, array $products)
@@ -40,6 +41,7 @@ class ProductService
             $orderProducts[$productId] = ['quantity' => $quantity];
         }
         $order->products()->attach($orderProducts);
+
         return $ingredientsNotificationToMerchant;
     }
 }

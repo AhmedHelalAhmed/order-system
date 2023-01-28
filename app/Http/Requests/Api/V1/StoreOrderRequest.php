@@ -24,9 +24,9 @@ class StoreOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            "products" => ["required", "array"],
-            "products.*.product_id" => ["required", "integer", "exists:products,id"],
-            "products.*.quantity" => ["required", "integer", "min:1"]
+            'products' => ['required', 'array'],
+            'products.*.product_id' => ['required', 'integer', 'exists:products,id'],
+            'products.*.quantity' => ['required', 'integer', 'min:1'],
         ];
     }
 
@@ -37,8 +37,7 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'products.*.product_id' => 'product',
-            'products.*.quantity' => 'quantity'
+            'products.*.quantity' => 'quantity',
         ];
     }
-
 }

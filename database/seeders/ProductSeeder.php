@@ -18,7 +18,7 @@ class ProductSeeder extends Seeder
      */
     public function run()
     {
-        if (!Product::count()) {
+        if (! Product::count()) {
             DB::beginTransaction();
             $product = Product::create([
                 'name' => DefaultProductEnum::PRODUCT_NAME,

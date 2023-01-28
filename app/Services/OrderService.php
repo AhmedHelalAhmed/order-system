@@ -17,7 +17,7 @@ class OrderService
     private ProductService $productService;
 
     /**
-     * @param ProductService $productStockService
+     * @param  ProductService  $productStockService
      */
     public function __construct(ProductService $productService)
     {
@@ -25,9 +25,10 @@ class OrderService
     }
 
     /**
-     * @param array $data
-     * @param int $userId
+     * @param  array  $data
+     * @param  int  $userId
      * @return bool
+     *
      * @throws \Throwable
      */
     public function execute(array $data, int $userId): bool
@@ -44,14 +45,15 @@ class OrderService
                     $ingredientsNotificationToMerchant
                 ));
             }
-            return true;
 
+            return true;
         } catch (Exception $exception) {
             DB::rollBack();
 
-            Log::error('[order-store]: error in order: ' . $exception->getMessage(), [
-                'exception' => $exception
+            Log::error('[order-store]: error in order: '.$exception->getMessage(), [
+                'exception' => $exception,
             ]);
+
             return false;
         }
     }

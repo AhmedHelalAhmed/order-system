@@ -21,7 +21,7 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         IngredientsReachBelowPercentage::class => [
-            NotifyMerchant::class
+            NotifyMerchant::class,
         ],
     ];
 

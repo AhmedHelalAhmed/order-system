@@ -6,7 +6,6 @@ use App\Events\IngredientsReachBelowPercentage;
 use App\Mail\IngredientReachPercentageLimit;
 use App\Models\Ingredient;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Mail;
 
 class NotifyMerchant implements ShouldQueue
@@ -14,7 +13,7 @@ class NotifyMerchant implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param object $event
+     * @param  object  $event
      * @return void
      */
     public function handle(IngredientsReachBelowPercentage $event)
