@@ -50,9 +50,10 @@ can use the following levels for seeding the database:
 - Database transaction to rollback if there is an error happened
 - Event fired (IngredientsReachBelowPercentage) to notify the merchant when the stock reach below 50% of the level for ingredient with queue listener (NotifyMerchant) using redis
 - Integration and unit tests
+- You should first generate token from (Generate bearer tokens API) and send it in order API check postman collection
 
 ## Docker environment steps to setup the projects
-- Clone the project
+- Clone the project then open terminal inside the project directory and run
 - ``` cp .env.example .env ```
 - ```docker-compose up -d --build```
 - ```docker-compose run --rm composer install```
@@ -70,6 +71,12 @@ can use the following levels for seeding the database:
 - phpmyadmin: ui for database
 - redis: in-memory database use here as queue driver
 - webserver: nginx
+
+## links for docker in local [Postman collection](https://www.postman.com/ahmedhelalahmed/workspace/ahmed-helal/collection/3913416-5b97c36f-5975-47f6-b42e-6bbe61533694?action=share&creator=3913416)
+- [Generate bearer tokens API](http://localhost/api/v1/tokens)
+- [Store order API](http://localhost/api/v1/orders)
+- [phpmyadmin](http://localhost:8080)
+- [mailhog](http://localhost:8025)
 
 ## Commands without docker
 - Clone the project
