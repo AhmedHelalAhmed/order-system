@@ -27,7 +27,7 @@ class ProductService
      *
      * @throws \Throwable
      */
-    public function processOrderProdcuts(Order $order, array $products)
+    public function processOrderProdcuts(Order $order, array $products): array
     {
         $ingredientsNotificationToMerchant = [];
         $orderProducts = [];

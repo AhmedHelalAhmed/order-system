@@ -11,14 +11,23 @@ class OrderController extends ApiController
 {
     private OrderService $orderService;
 
+    /**
+     * @param  OrderService  $orderService
+     */
     public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
     }
 
+    /**
+     * @param  StoreOrderRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Throwable
+     */
     public function __invoke(StoreOrderRequest $request)
     {
-        $status = $this->orderService->execute(
+        $status = $this->orderService->storeOrder(
             $request->validated(),
             auth()->id()
         );

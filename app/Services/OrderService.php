@@ -31,7 +31,7 @@ class OrderService
      *
      * @throws \Throwable
      */
-    public function execute(array $data, int $userId): bool
+    public function storeOrder(array $data, int $userId): bool
     {
         try {
             DB::beginTransaction();
