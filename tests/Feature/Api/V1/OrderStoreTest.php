@@ -155,6 +155,9 @@ class OrderStoreTest extends TestCase
         $this->login();
         $ingredients = Product::with('ingredients')->find(self::DEFAULT_PRODUCT_ID)->ingredients;
         // Here the ingredient will reach the limit of level to notify the merchant
+        $this->assertDatabaseMissing('ingredients', [
+            'is_merchant_notified' => true,
+        ]);
         while (
         !$ingredients
             ->fresh()
