@@ -18,13 +18,13 @@ class NotifyMerchant implements ShouldQueue
      */
     public function handle(IngredientsReachBelowPercentage $event)
     {
-        $ingredients = Ingredient::select('name', 'id')->whereIn('id', $event->ingredientsIds)->where('is_merchant_notified', false)->get();
-        if (count($ingredients)) {
+        $ingredients = Ingredient::getWithMerchantNotNotified($event->ingredientsIds);
+        if ($ingredients->isNotEmpty()) {
             Mail::to(config('main.merchant_email'))
                 ->send(new IngredientReachPercentageLimit(
                     $ingredients->pluck('name')->toArray()
                 ));
         }
-        Ingredient::whereIn('id', $ingredients->pluck('id'))->update(['is_merchant_notified' => true]);
+        Ingredient::updateMerchantToNotified($ingredients->pluck('id')->toArray());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -71,5 +72,35 @@ class Ingredient extends Model
     public function getCurrentStockPercentage(int $quantityToDecrease = 0)
     {
         return (($this->stock - $quantityToDecrease) / $this->start_stock) * 100;
+    }
+
+    /**
+     * @param  Builder  $query
+     * @return Builder
+     */
+    public function scopeMerchantNotNotified(Builder $query)
+    {
+        return $query->where('is_merchant_notified', false);
+    }
+
+    /**
+     * @param  array  $ingredientsIds
+     * @return mixed
+     */
+    public static function getWithMerchantNotNotified(array $ingredientsIds)
+    {
+        return self::select('name', 'id')
+            ->whereIn('id', $ingredientsIds)
+            ->merchantNotNotified()
+            ->get();
+    }
+
+    /**
+     * @param  array  $ingredientsIds
+     * @return void
+     */
+    public static function updateMerchantToNotified(array $ingredientsIds)
+    {
+        self::whereIn('id', $ingredientsIds)->update(['is_merchant_notified' => true]);
     }
 }
